@@ -107,7 +107,11 @@ class Payment(Base):
 class PaymentCreate(BaseModel):
     order_id: str = Field(min_length=1, max_length=64)
     amount: float = Field(gt=0, description="Payment amount, must be > 0")
-    currency: Literal["USD"] = "USD"
+    currency: str = Field(pattern=r"^[uU][sS][dD]$", description="USD only (case-insensitive)")
+
+    def model_post_init(self, __context):  # pydantic v2 hook
+        # normalize currency to upper-case
+        self.currency = self.currency.upper()
 
 
 class PaymentRead(BaseModel):
