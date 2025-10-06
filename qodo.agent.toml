@@ -1,0 +1,30 @@
+# Sample Qodo agent configuration for this repository.
+# Adjust to your environment and agent capabilities.
+
+[agent]
+name = "merge-like"
+mode = "review"
+
+[review]
+# Auto-generate PR description from diff and context
+auto_generate_description = true
+
+# Checks to enforce
+checks = [
+  "tests_present",
+  "api_key_header_enforced",
+]
+
+[checks.tests_present]
+# ensure tests/ directory exists and includes at least one test file
+path = "tests"
+required_patterns = ["test_*.py"]
+
+[checks.api_key_header_enforced]
+# Verify X-API-KEY is required on write endpoints
+header = "X-API-KEY"
+endpoints = ["POST /payments"]
+severity = "blocking"
+
+[output]
+format = "markdown"

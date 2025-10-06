@@ -1,0 +1,20 @@
+# Alternative location for Qodo configuration
+[agent]
+name = "merge-like"
+mode = "review"
+
+[review]
+auto_generate_description = true
+checks = ["tests_present", "api_key_header_enforced"]
+
+[checks.tests_present]
+path = "tests"
+required_patterns = ["test_*.py"]
+
+[checks.api_key_header_enforced]
+header = "X-API-KEY"
+endpoints = ["POST /payments"]
+severity = "blocking"
+
+[output]
+format = "markdown"
