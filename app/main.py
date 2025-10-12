@@ -4,12 +4,13 @@ from datetime import datetime
 from decimal import Decimal
 from functools import lru_cache
 from typing import Annotated, Literal
+from collections.abc import Generator
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import DateTime, Integer, Numeric, String, create_engine, select
-from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 
 # =========================
@@ -76,7 +77,8 @@ def configure_logging(level: str = "INFO") -> None:
 # =============
 # Database setup
 # =============
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 def _create_engine(db_url: str):
@@ -141,7 +143,7 @@ class PaymentRepository:
 # Dependencies & Security
 # ======================
 
-def get_db() -> Session:
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
