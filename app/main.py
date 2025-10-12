@@ -150,8 +150,8 @@ def get_db() -> Session:
 
 
 def verify_api_key(
-    x_api_key: Annotated[str | None, Header(alias="X-API-KEY")] = None,
     cfg: Annotated[Settings, Depends(get_settings)],
+    x_api_key: Annotated[str | None, Header(alias="X-API-KEY")] = None,
 ) -> None:
     if not x_api_key or x_api_key != cfg.API_KEY:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key")
