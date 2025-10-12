@@ -6,10 +6,10 @@ from functools import lru_cache
 from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy import create_engine, String, Integer, DateTime, func, select, Numeric
-from sqlalchemy.orm import declarative_base, sessionmaker, Mapped, mapped_column, Session
+from sqlalchemy import DateTime, Integer, Numeric, String, create_engine, select
+from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column, sessionmaker
 
 
 # =========================
@@ -150,8 +150,8 @@ def get_db() -> Session:
 
 
 def verify_api_key(
-    x_api_key: str | None = Header(None, alias="X-API-KEY"),
-    cfg: Settings = Depends(get_settings),
+    x_api_key: Annotated[str | None, Header(alias="X-API-KEY")] = None,
+    cfg: Annotated[Settings, Depends(get_settings)],
 ) -> None:
     if not x_api_key or x_api_key != cfg.API_KEY:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key")
