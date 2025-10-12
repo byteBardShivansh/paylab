@@ -23,39 +23,19 @@ jobs:
         run: |
           ruff check .
           mypy app
-      - name: Qodo Review
-        if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          # Install qodo CLI if not present
-          if ! command -v qodo >/dev/null 2>&1; then
-            pip install qodo-cli || true
-          fi
-          REVIEW_OUTPUT=$(qodo review --pr ${{ github.event.pull_request.number }} || true)
-          echo "$REVIEW_OUTPUT"
-          # Extract blocking flag: expects a JSON line like 'blocking: true/false' or JSON output
-          BLOCKING=$(echo "$REVIEW_OUTPUT" | grep -i "blocking:" | awk -F: '{gsub(/ /,""); print tolower($2)}')
-          if [ "$BLOCKING" = "true" ]; then
-            echo "Qodo review marked this PR as blocking" >&2
-            exit 1
-          fi
       - name: Install Node.js
+        if: ${{ github.event_name == 'pull_request' && secrets.QODO_API_KEY != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Install Qodo Command
+        if: ${{ github.event_name == 'pull_request' && secrets.QODO_API_KEY != '' }}
         run: |
-          if [ "latest" = "latest" ]; then
-            npm install -g @qodo/command
-          else
-            npm install -g @qodo/command@latest
-          fi
+          npm install -g @qodo/command
       - name: Run Qodo Command
+        if: ${{ github.event_name == 'pull_request' && secrets.QODO_API_KEY != '' }}
+        env:
+          QODO_API_KEY: ${{ secrets.QODO_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          QODO_CMD="qodo --ci"
-          # Add the prompt at the end
-          QODO_CMD="$QODO_CMD \"<command>\""
-          echo "Running: $QODO_CMD"
-          eval $QODO_CMD
+          qodo review --pr ${{ github.event.pull_request.number }} --ci
