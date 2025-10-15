@@ -1,6 +1,7 @@
+import pytest
+
 from fastapi import Depends, FastAPI, status
 from fastapi.testclient import TestClient
-import pytest
 
 from app.main import Settings, get_settings, verify_api_key
 
