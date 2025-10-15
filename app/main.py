@@ -101,8 +101,7 @@ class Payment(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
-
-
+    
 # =============
 # Pydantic DTOs
 # =============
