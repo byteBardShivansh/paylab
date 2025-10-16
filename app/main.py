@@ -1,15 +1,16 @@
 import json
 import logging
+from collections.abc import Generator
 from datetime import datetime
 from decimal import Decimal
 from functools import lru_cache
 from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy import create_engine, String, Integer, DateTime, func, select, Numeric
-from sqlalchemy.orm import declarative_base, sessionmaker, Mapped, mapped_column, Session
+from sqlalchemy import create_engine, DateTime, Integer, Numeric, String, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 
 # =========================
@@ -76,7 +77,8 @@ def configure_logging(level: str = "INFO") -> None:
 # =============
 # Database setup
 # =============
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 def _create_engine(db_url: str):
@@ -99,8 +101,7 @@ class Payment(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
-
-
+    
 # =============
 # Pydantic DTOs
 # =============
@@ -141,7 +142,7 @@ class PaymentRepository:
 # Dependencies & Security
 # ======================
 
-def get_db() -> Session:
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
@@ -150,8 +151,8 @@ def get_db() -> Session:
 
 
 def verify_api_key(
-    x_api_key: str | None = Header(None, alias="X-API-KEY"),
-    cfg: Settings = Depends(get_settings),
+    cfg: Annotated[Settings, Depends(get_settings)],
+    x_api_key: Annotated[str | None, Header(alias="X-API-KEY")] = None,
 ) -> None:
     if not x_api_key or x_api_key != cfg.API_KEY:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key")
