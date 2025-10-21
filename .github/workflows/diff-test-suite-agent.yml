@@ -10,7 +10,7 @@ env:
 jobs:
   generate-tests:
     runs-on: ubuntu-latest
-    if: ${{ env.QODO_API_KEY != '' }}
+  if: ${{ secrets.QODO_API_KEY != '' }}
     permissions:
       contents: write
       pull-requests: write

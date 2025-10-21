@@ -1,0 +1,32 @@
+{
+  "name": "paylab",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Payments Microservice featuring FastAPI, SQLAlchemy, structured JSON logging, and environment-based configuration.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:install": "playwright install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byteBardShivansh/paylab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/byteBardShivansh/paylab/issues"
+  },
+  "homepage": "https://github.com/byteBardShivansh/paylab#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
